@@ -89,6 +89,10 @@ internal class Program
                 points += 200;
             }
             goalNotReached = reachedGoal(mapRows, origCol, origRow);
+            if(!runIntoEnemy(mapRows, origCol, origRow))
+            {
+                goalNotReached = false;
+            }
         }
         while(goalNotReached);
 
@@ -96,9 +100,16 @@ internal class Program
         Console.WriteLine();
         stopwatch.Stop();
         Console.Clear();
-
-        Console.WriteLine($"Congratulations! You reached the end of the maze with a score of {points}!!!");
-        Console.WriteLine($"It took you {seconds} seconds to complete!");
+        
+        if(!reachedGoal(mapRows, origCol, origRow))
+        {
+            Console.WriteLine($"Congratulations! You reached the end of the maze with a score of {points}!!!");
+            Console.WriteLine($"It took you {seconds} seconds to complete!");
+        }
+        else
+        {
+            Console.WriteLine($"Game over. Score: {points}");
+        }
     }
     static void programIntro()
     {
@@ -163,5 +174,14 @@ internal class Program
         Console.SetCursorPosition(0, row);
         Console.Write(map[row]);
         Console.SetCursorPosition(col, row);
+    }
+
+    static bool runIntoEnemy(string [] map, int col, int row)
+    {
+        if(map[row][col].Equals('%'))
+        {
+            return false;
+        }
+        return true;
     }
 }
