@@ -26,7 +26,7 @@ internal class Program
         Console.Clear();
 
         int coinCount = 0;
-        int points = 0;
+        long points = 0;
         int origRow = Console.CursorTop + 1;
         int origCol = Console.CursorLeft + 1;
         foreach(string row in mapRows)
@@ -100,6 +100,8 @@ internal class Program
         Console.WriteLine();
         stopwatch.Stop();
         Console.Clear();
+
+        points = points - (seconds*10);
         
         if(!reachedGoal(mapRows, origCol, origRow))
         {
@@ -113,7 +115,7 @@ internal class Program
     }
     static void programIntro()
     {
-        Console.WriteLine("This program will present a maze for you to move through using directional arrows, your goal is to reach the *");
+        Console.WriteLine("This program will present a maze for you to move through using directional arrows, your goal is to reach the #, ^ are coins to collect, and % are enemies. The faster you go the better score you get");
         Console.WriteLine("Goodluck! Press any button to continue");
     }
 
