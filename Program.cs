@@ -26,6 +26,7 @@ internal class Program
         Console.Clear();
 
         int coinCount = 0;
+        int points = 0;
         int origRow = Console.CursorTop + 1;
         int origCol = Console.CursorLeft + 1;
         foreach(string row in mapRows)
@@ -72,6 +73,7 @@ internal class Program
             {
                 collectCoins(mapRows, origCol, origRow);
                 coinCount++;
+                points += 100;
             }
             if(openGate(coinCount))
             {
@@ -80,6 +82,11 @@ internal class Program
                 Console.SetCursorPosition(0, 10);
                 Console.Write(mapRows[10]);
                 Console.SetCursorPosition(origCol, origRow);
+            }
+            if(mapRows[origRow][origCol].Equals('$'))
+            {
+                collectExtraPoints(mapRows, origCol, origRow);
+                points += 200;
             }
             goalNotReached = reachedGoal(mapRows, origCol, origRow);
         }
@@ -90,7 +97,7 @@ internal class Program
         stopwatch.Stop();
         Console.Clear();
 
-        Console.WriteLine("Congratulations! You reached the end of the maze!!!");
+        Console.WriteLine($"Congratulations! You reached the end of the maze with a score of {points}!!!");
         Console.WriteLine($"It took you {seconds} seconds to complete!");
     }
     static void programIntro()
@@ -135,6 +142,7 @@ internal class Program
     static void collectCoins(string [] map, int col, int row)
     {
         map[row] = map[row].Replace('^', ' ');
+        //reprint the line of characters once the character is replaces
         Console.SetCursorPosition(0, row);
         Console.Write(map[row]);
         Console.SetCursorPosition(col, row);
@@ -147,5 +155,13 @@ internal class Program
             return true;
         }
         return false;
+    }
+
+    static void collectExtraPoints(string [] map, int col, int row)
+    {
+        map[row] = map[row].Substring(0, col) + " " + map[row].Substring(col + 1, map[row].Length - col - 2);
+        Console.SetCursorPosition(0, row);
+        Console.Write(map[row]);
+        Console.SetCursorPosition(col, row);
     }
 }
