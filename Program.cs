@@ -76,6 +76,14 @@ internal class Program
                 Console.SetCursorPosition(origCol, origRow);
                 coinCount++;
             } 
+            if(openGate(coinCount))
+            {
+                //the middle part of the gate is found in the 10th index of the array
+                mapRows[10] = mapRows[10].Replace('|', ' ');
+                Console.SetCursorPosition(0, 10);
+                Console.Write(mapRows[10]);
+                Console.SetCursorPosition(origCol, origRow);
+            }
             goalNotReached = reachedGoal(mapRows, origCol, origRow);
         }
         while(goalNotReached);
@@ -111,7 +119,7 @@ internal class Program
         {
             return false;
         }
-        if(map[row][col].Equals('|') && coins != 10)
+        if(map[row][col].Equals('|') /*&& coins != 10*/)
         {
             return false;
         }
@@ -134,6 +142,15 @@ internal class Program
     static bool collectCoins(string [] map, int col, int row)
     {
         if(map[row][col].Equals('^'))
+        {
+            return true;
+        }
+        return false;
+    }
+
+    static bool openGate(int coins)
+    {
+        if(coins == 10)
         {
             return true;
         }
