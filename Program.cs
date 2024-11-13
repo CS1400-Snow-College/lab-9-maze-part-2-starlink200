@@ -8,6 +8,7 @@
 using System.Reflection.Metadata;
 using System.Diagnostics;
 using System.Security.Principal;
+using System.Runtime.CompilerServices;
 internal class Program
 {
 
@@ -24,6 +25,7 @@ internal class Program
         stopwatch.Start();
         Console.Clear();
 
+        int coinCount = 0;
         int origRow = Console.CursorTop + 1;
         int origCol = Console.CursorLeft + 1;
         foreach(string row in mapRows)
@@ -56,7 +58,7 @@ internal class Program
                     origCol++;
                     break;
             }
-            if(tryMove(mapRows, origCol, origRow))
+            if(tryMove(mapRows, origCol, origRow, coinCount))
             {
                 Console.SetCursorPosition(origCol, origRow);
             }
@@ -66,6 +68,14 @@ internal class Program
                 origRow = copyRow;
                 Console.SetCursorPosition(origCol, origRow);
             }
+            if(collectCoins(mapRows, origCol, origRow))
+            {
+                mapRows[origRow] = mapRows[origRow].Replace('^', ' ');
+                Console.SetCursorPosition(0, origRow);
+                Console.Write(mapRows[origRow]);
+                Console.SetCursorPosition(origCol, origRow);
+                coinCount++;
+            } 
             goalNotReached = reachedGoal(mapRows, origCol, origRow);
         }
         while(goalNotReached);
@@ -95,9 +105,13 @@ internal class Program
 
     //tests to make sure that where the user wants to go is valid
     //can't go past the top or bottom of maze and can't go to the left or right of the maze
-    static bool tryMove(string[] map, int col, int row)
+    static bool tryMove(string[] map, int col, int row, int coins)
     {
-        if(map[row][col].Equals('*') || map[row][col].Equals('|'))
+        if(map[row][col].Equals('*'))
+        {
+            return false;
+        }
+        if(map[row][col].Equals('|') && coins != 10)
         {
             return false;
         }
@@ -115,5 +129,14 @@ internal class Program
         string[] map = new string[6];
         map = File.ReadAllLines($"maze.txt");
         return map;
+    }
+
+    static bool collectCoins(string [] map, int col, int row)
+    {
+        if(map[row][col].Equals('^'))
+        {
+            return true;
+        }
+        return false;
     }
 }
