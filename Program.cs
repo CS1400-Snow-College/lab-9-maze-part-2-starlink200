@@ -68,14 +68,11 @@ internal class Program
                 origRow = copyRow;
                 Console.SetCursorPosition(origCol, origRow);
             }
-            if(collectCoins(mapRows, origCol, origRow))
+            if(mapRows[origRow][origCol].Equals('^'))
             {
-                mapRows[origRow] = mapRows[origRow].Replace('^', ' ');
-                Console.SetCursorPosition(0, origRow);
-                Console.Write(mapRows[origRow]);
-                Console.SetCursorPosition(origCol, origRow);
+                collectCoins(mapRows, origCol, origRow);
                 coinCount++;
-            } 
+            }
             if(openGate(coinCount))
             {
                 //the middle part of the gate is found in the 10th index of the array
@@ -115,11 +112,7 @@ internal class Program
     //can't go past the top or bottom of maze and can't go to the left or right of the maze
     static bool tryMove(string[] map, int col, int row, int coins)
     {
-        if(map[row][col].Equals('*'))
-        {
-            return false;
-        }
-        if(map[row][col].Equals('|') /*&& coins != 10*/)
+        if(map[row][col].Equals('*') || map[row][col].Equals('|'))
         {
             return false;
         }
@@ -139,13 +132,12 @@ internal class Program
         return map;
     }
 
-    static bool collectCoins(string [] map, int col, int row)
+    static void collectCoins(string [] map, int col, int row)
     {
-        if(map[row][col].Equals('^'))
-        {
-            return true;
-        }
-        return false;
+        map[row] = map[row].Replace('^', ' ');
+        Console.SetCursorPosition(0, row);
+        Console.Write(map[row]);
+        Console.SetCursorPosition(col, row);
     }
 
     static bool openGate(int coins)
