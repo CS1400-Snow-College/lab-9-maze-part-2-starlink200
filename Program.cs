@@ -18,6 +18,7 @@ internal class Program
         Random rand = new Random();
         int randMapNum = rand.Next(1,6);
         string[] mapRows = mapChoice(randMapNum);
+        char[][] mapChar = mapRows.Select(item => item.ToArray()).ToArray();
         
 
         programIntro();
@@ -29,9 +30,9 @@ internal class Program
         long points = 0;
         int origRow = Console.CursorTop + 1;
         int origCol = Console.CursorLeft + 1;
-        foreach(string row in mapRows)
+        foreach(char[] character in mapChar)
         {
-            Console.WriteLine(row);
+            Console.WriteLine(character);
         }
         Console.SetCursorPosition(origCol, origRow);
 
@@ -71,7 +72,7 @@ internal class Program
             }
             if(mapRows[origRow][origCol].Equals('^'))
             {
-                collectCoins(mapRows, origCol, origRow);
+                collectCoins(mapChar, origCol, origRow);
                 coinCount++;
                 points += 100;
             }
@@ -85,7 +86,7 @@ internal class Program
             }
             if(mapRows[origRow][origCol].Equals('$'))
             {
-                collectExtraPoints(mapRows, origCol, origRow);
+                collectExtraPoints(mapChar, origCol, origRow);
                 points += 200;
             }
             goalNotReached = reachedGoal(mapRows, origCol, origRow);
@@ -101,6 +102,7 @@ internal class Program
         stopwatch.Stop();
         Console.Clear();
 
+        //change score based on how long the user takes to reach the end
         points = points - (seconds*10);
         
         if(!reachedGoal(mapRows, origCol, origRow))
@@ -152,12 +154,10 @@ internal class Program
         return map;
     }
 
-    static void collectCoins(string [] map, int col, int row)
+    static void collectCoins(char[][] map, int col, int row)
     {
-        map[row] = map[row].Replace('^', ' ');
-        //reprint the line of characters once the character is replaces
-        Console.SetCursorPosition(0, row);
-        Console.Write(map[row]);
+        map[row][col] = ' ';
+        Console.Write(map[row][col]);
         Console.SetCursorPosition(col, row);
     }
 
@@ -170,11 +170,10 @@ internal class Program
         return false;
     }
 
-    static void collectExtraPoints(string [] map, int col, int row)
+    static void collectExtraPoints(char[][] map, int col, int row)
     {
-        map[row] = map[row].Substring(0, col) + " " + map[row].Substring(col + 1, map[row].Length - col - 2);
-        Console.SetCursorPosition(0, row);
-        Console.Write(map[row]);
+        map[row][col] = ' ';
+        Console.Write(map[row][col]);
         Console.SetCursorPosition(col, row);
     }
 
