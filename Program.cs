@@ -30,6 +30,8 @@ internal class Program
         long points = 0;
         int origRow = Console.CursorTop + 1;
         int origCol = Console.CursorLeft + 1;
+        int enemyRow = 5;
+        int enemyCol = 14;
         foreach(char[] character in mapChar)
         {
             Console.WriteLine(character);
@@ -40,27 +42,44 @@ internal class Program
         long seconds = 0;
         int copyCol = 0;
         int copyRow = 0;
+        int copyEnemyRow = 0;
+        int copyEnemyCol = 0;
         do
         {
             //copies of the original row and column values in case moving is invalid
             copyCol = origCol;
             copyRow = origRow;
+            copyEnemyRow = enemyRow;
+            copyEnemyCol = enemyCol;
             switch(Console.ReadKey(true).Key)
             {
                 case ConsoleKey.UpArrow:
                     origRow--;
+                    enemyRow--;
                     break;
                 case ConsoleKey.DownArrow:
                     origRow++;
+                    enemyRow++;
                     break;
                 case ConsoleKey.LeftArrow:
                     origCol--;
+                    enemyCol--;
                     break;
                 case ConsoleKey.RightArrow:
                     origCol++;
+                    enemyCol++;
                     break;
             }
-            if(tryMove(mapRows, origCol, origRow, coinCount))
+            if(tryMove(mapRows, enemyCol, enemyRow))
+            {
+                moveEnemy(mapChar, enemyCol, enemyRow, copyEnemyCol, copyEnemyRow);
+            }
+            else
+            {
+                enemyRow = copyEnemyRow;
+                enemyCol = copyEnemyCol;
+            }
+            if(tryMove(mapRows, origCol, origRow))
             {
                 Console.SetCursorPosition(origCol, origRow);
             }
@@ -132,7 +151,7 @@ internal class Program
 
     //tests to make sure that where the user wants to go is valid
     //can't go past the top or bottom of maze and can't go to the left or right of the maze
-    static bool tryMove(string[] map, int col, int row, int coins)
+    static bool tryMove(string[] map, int col, int row)
     {
         if(map[row][col].Equals('*') || map[row][col].Equals('|'))
         {
@@ -184,5 +203,16 @@ internal class Program
             return false;
         }
         return true;
+    }
+
+    static void moveEnemy(char[][] map, int col, int row, int previousCol, int previousRow)
+    {
+        map[previousRow][previousCol] = ' ';
+        Console.SetCursorPosition(previousCol, previousRow);
+        Console.Write(map[previousRow][previousCol]);
+        map[row][col] = '%';
+        Console.SetCursorPosition(col, row);
+        Console.Write(map[row][col]);
+        
     }
 }
