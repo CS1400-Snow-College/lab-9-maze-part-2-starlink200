@@ -84,6 +84,8 @@ internal class Program
                     default:
                         break;
                 }
+
+                //enemies movement, tracks 2 using 2 seperate if statements
                 if(tryMove(mapChar, enemy1XY[1], enemy1XY[0])&& !mapChar[enemy1XY[0]][enemy1XY[1]].Equals('^'))
                 {
                     moveEnemy(mapChar, enemy1XY[1], enemy1XY[0], enemy1X, enemy1Y);
@@ -102,6 +104,8 @@ internal class Program
                     enemy2XY[0] = enemy2Y;
                     enemy2XY[1] = enemy2X;
                 }
+
+                //users movement the copy is what the number was before changing, so if its not possible to move to the spot the x and y values are set back to what they were
                 if(tryMove(mapChar, origCol, origRow))
                 {
                     Console.SetCursorPosition(origCol, origRow);
@@ -112,12 +116,23 @@ internal class Program
                     origRow = copyRow;
                     Console.SetCursorPosition(origCol, origRow);
                 }
-                if(mapChar[origRow][origCol].Equals('^'))
+
+                //collect ^ and $ when the cursor is over that spot
+                if(mapChar[origRow][origCol].Equals('^') || mapChar[origRow][origCol].Equals('$'))
                 {
-                    collectCoins(mapChar, origCol, origRow);
-                    coinCount++;
-                    points += 100;
+                    if(mapChar[origRow][origCol].Equals('^'))
+                    {
+                        coinCount++;
+                        points += 100;
+                    }
+                    else
+                    {
+                        points += 200;
+                    }
+                    collectPoints(mapChar, origCol, origRow);
                 }
+
+                //open gate once all 10 coins are collected
                 if(openGate(coinCount))
                 {
                     //the middle part of the gate is found in the 10th index of the array
@@ -126,11 +141,7 @@ internal class Program
                     Console.WriteLine(mapChar[10][18]);
                     Console.SetCursorPosition(origCol, origRow);
                 }
-                if(mapChar[origRow][origCol].Equals('$'))
-                {
-                    collectExtraPoints(mapChar, origCol, origRow);
-                    points += 200;
-                }
+
                 goalNotReached = reachedGoal(mapChar, origCol, origRow);
                 if(!runIntoEnemy(mapChar, origCol, origRow))
                 {
@@ -157,6 +168,8 @@ internal class Program
             {
                 Console.WriteLine($"Game over. Score: {points}");
             }
+
+            //ask players if they want to play again and loop program if they do
             Console.ReadKey();
             playAgain = keepPlaying();
         }
@@ -201,7 +214,7 @@ internal class Program
         return map;
     }
 
-    static void collectCoins(char[][] map, int col, int row)
+    static void collectPoints(char[][] map, int col, int row)
     {
         map[row][col] = ' ';
         Console.Write(map[row][col]);
@@ -215,13 +228,6 @@ internal class Program
             return true;
         }
         return false;
-    }
-
-    static void collectExtraPoints(char[][] map, int col, int row)
-    {
-        map[row][col] = ' ';
-        Console.Write(map[row][col]);
-        Console.SetCursorPosition(col, row);
     }
 
     static bool runIntoEnemy(char[][] map, int col, int row)
