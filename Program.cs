@@ -9,6 +9,7 @@ using System.Reflection.Metadata;
 using System.Diagnostics;
 using System.Security.Principal;
 using System.Runtime.CompilerServices;
+using System.Data;
 internal class Program
 {
 
@@ -19,6 +20,8 @@ internal class Program
         int randMapNum = rand.Next(1,6);
         string[] mapRows = mapChoice(randMapNum);
         char[][] mapChar = mapRows.Select(item => item.ToArray()).ToArray();
+        int[] enemy1XY = {5,14};
+        int[] enemy2XY = {15,38};
         
 
         programIntro();
@@ -30,8 +33,6 @@ internal class Program
         long points = 0;
         int origRow = Console.CursorTop + 1;
         int origCol = Console.CursorLeft + 1;
-        int enemyRow = 5;
-        int enemyCol = 14;
         foreach(char[] character in mapChar)
         {
             Console.WriteLine(character);
@@ -42,44 +43,63 @@ internal class Program
         long seconds = 0;
         int copyCol = 0;
         int copyRow = 0;
-        int copyEnemyRow = 0;
-        int copyEnemyCol = 0;
+        int enemy1X = 0;
+        int enemy1Y = 0;
+        int enemy2X = 0;
+        int enemy2Y = 0;
         do
         {
             //copies of the original row and column values in case moving is invalid
             copyCol = origCol;
             copyRow = origRow;
-            copyEnemyRow = enemyRow;
-            copyEnemyCol = enemyCol;
+            enemy1Y = enemy1XY[0];
+            enemy1X = enemy1XY[1];
+            enemy2Y = enemy2XY[0];
+            enemy2X = enemy2XY[1];
             switch(Console.ReadKey(true).Key)
             {
                 case ConsoleKey.UpArrow:
                     origRow--;
-                    enemyRow--;
+                    enemy1XY[0]--;
+                    enemy2XY[0]--;
                     break;
                 case ConsoleKey.DownArrow:
                     origRow++;
-                    enemyRow++;
+                    enemy1XY[0]++;
+                    enemy2XY[0]++;
                     break;
                 case ConsoleKey.LeftArrow:
                     origCol--;
-                    enemyCol--;
+                    enemy1XY[1]--;
+                    enemy2XY[1]--;
                     break;
                 case ConsoleKey.RightArrow:
                     origCol++;
-                    enemyCol++;
+                    enemy1XY[1]++;
+                    enemy2XY[1]++;
+                    break;
+                default:
                     break;
             }
-            if(tryMove(mapRows, enemyCol, enemyRow))
+            if(tryMove(mapChar, enemy1XY[1], enemy1XY[0]))
             {
-                moveEnemy(mapChar, enemyCol, enemyRow, copyEnemyCol, copyEnemyRow);
+                moveEnemy(mapChar, enemy1XY[1], enemy1XY[0], enemy1X, enemy1Y);
             }
             else
             {
-                enemyRow = copyEnemyRow;
-                enemyCol = copyEnemyCol;
+                enemy1XY[0] = enemy1Y;
+                enemy1XY[1] = enemy1X;
             }
-            if(tryMove(mapRows, origCol, origRow))
+            if(tryMove(mapChar, enemy2XY[1], enemy2XY[0]))
+            {
+                moveEnemy(mapChar, enemy2XY[1], enemy2XY[0], enemy2X, enemy2Y);
+            }
+            else
+            {
+                enemy2XY[0] = enemy2Y;
+                enemy2XY[1] = enemy2X;
+            }
+            if(tryMove(mapChar, origCol, origRow))
             {
                 Console.SetCursorPosition(origCol, origRow);
             }
@@ -89,7 +109,7 @@ internal class Program
                 origRow = copyRow;
                 Console.SetCursorPosition(origCol, origRow);
             }
-            if(mapRows[origRow][origCol].Equals('^'))
+            if(mapChar[origRow][origCol].Equals('^'))
             {
                 collectCoins(mapChar, origCol, origRow);
                 coinCount++;
@@ -98,18 +118,18 @@ internal class Program
             if(openGate(coinCount))
             {
                 //the middle part of the gate is found in the 10th index of the array
-                mapRows[10] = mapRows[10].Replace('|', ' ');
-                Console.SetCursorPosition(0, 10);
-                Console.Write(mapRows[10]);
+                mapChar[10][18] = ' ';
+                Console.SetCursorPosition(18,10);
+                Console.WriteLine(mapChar[10][18]);
                 Console.SetCursorPosition(origCol, origRow);
             }
-            if(mapRows[origRow][origCol].Equals('$'))
+            if(mapChar[origRow][origCol].Equals('$'))
             {
                 collectExtraPoints(mapChar, origCol, origRow);
                 points += 200;
             }
-            goalNotReached = reachedGoal(mapRows, origCol, origRow);
-            if(!runIntoEnemy(mapRows, origCol, origRow))
+            goalNotReached = reachedGoal(mapChar, origCol, origRow);
+            if(!runIntoEnemy(mapChar, origCol, origRow))
             {
                 goalNotReached = false;
             }
@@ -124,7 +144,7 @@ internal class Program
         //change score based on how long the user takes to reach the end
         points = points - (seconds*10);
         
-        if(!reachedGoal(mapRows, origCol, origRow))
+        if(!reachedGoal(mapChar, origCol, origRow))
         {
             Console.WriteLine($"Congratulations! You reached the end of the maze with a score of {points}!!!");
             Console.WriteLine($"It took you {seconds} seconds to complete!");
@@ -140,7 +160,7 @@ internal class Program
         Console.WriteLine("Goodluck! Press any button to continue");
     }
 
-    static bool reachedGoal(string[] map, int col, int row)
+    static bool reachedGoal(char[][] map, int col, int row)
     {
         if(map[row][col].Equals('#'))
         {
@@ -151,7 +171,7 @@ internal class Program
 
     //tests to make sure that where the user wants to go is valid
     //can't go past the top or bottom of maze and can't go to the left or right of the maze
-    static bool tryMove(string[] map, int col, int row)
+    static bool tryMove(char[][] map, int col, int row)
     {
         if(map[row][col].Equals('*') || map[row][col].Equals('|'))
         {
@@ -196,7 +216,7 @@ internal class Program
         Console.SetCursorPosition(col, row);
     }
 
-    static bool runIntoEnemy(string [] map, int col, int row)
+    static bool runIntoEnemy(char[][] map, int col, int row)
     {
         if(map[row][col].Equals('%'))
         {
